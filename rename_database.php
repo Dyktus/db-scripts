@@ -6,7 +6,6 @@ $database = [
     'pass' => getenv('DATABASE_PASSWORD') ?? ''
 ];
 
-
 try {
     $connection = new PDO('mysql:host=' . $database['host'] . ';', $database['user'], $database['pass']);
 } catch (Exception $err) {
@@ -15,17 +14,14 @@ try {
 }
 
 // Get arguments
-$sourceDatabase = $argv[1];
-$finalDatabase = $argv[2];
-
+$sourceDatabase = $argv[1] ?? null;
+$finalDatabase = $argv[2] ?? null;
 
 // Now do the magic
 $stmt = $connection->prepare('SHOW DATABASES;');
 $stmt->execute();
 
-$databases = array_map(function ($item) {
-    return $item[0];
-}, $stmt->fetchAll(PDO::FETCH_NUM));
+$databases = getResultsFromDb($stmt);
 
 if (!in_array($sourceDatabase, $databases) ||
     !in_array($finalDatabase, $databases)) {
@@ -38,9 +34,7 @@ $stmt = $connection->prepare('SHOW TABLES;');
 $stmt->execute();
 
 
-$tables = array_map(function ($item) {
-    return $item[0];
-}, $stmt->fetchAll(PDO::FETCH_NUM));
+$tables = getResultsFromDb($stmt);
 
 try {
     $connection->beginTransaction();
@@ -56,3 +50,10 @@ try {
 }
 
 echo 'DONE' . PHP_EOL;
+
+function getResultsFromDb($stmt): array
+{
+    return array_map(function ($item) {
+        return $item[0];
+    }, $stmt->fetchAll(PDO::FETCH_NUM);
+}
