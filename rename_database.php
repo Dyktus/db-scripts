@@ -55,5 +55,5 @@ function getResultsFromDb($stmt): array
 {
     return array_map(function ($item) {
         return $item[0];
-    }, $stmt->fetchAll(PDO::FETCH_NUM);
+    }, $stmt->fetchAll(PDO::FETCH_NUM));
 }
